@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 const NeuralNetworkVisualizer = dynamic(() => import("@/components/NeuralNetworkVisualizer"), { ssr: false });
@@ -51,10 +52,18 @@ export default function Home() {
                 <p className="text-sm text-gray-400">Interactive Machine Learning Education Platform</p>
               </div>
             </div>
-            <p className="text-gray-400 text-sm max-w-2xl mt-3">
-              Explore how neural networks work through interactive simulations. Build, train, and visualize networks
-              in real-time while learning PyTorch fundamentals with auto-generated code.
-            </p>
+            <div className="flex items-center gap-4 mt-3">
+              <p className="text-gray-400 text-sm max-w-2xl">
+                Explore how neural networks work through interactive simulations. Build, train, and visualize networks
+                in real-time while learning PyTorch fundamentals with auto-generated code.
+              </p>
+              <Link
+                href="/paper"
+                className="shrink-0 px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg text-sm hover:bg-white/20 transition-colors"
+              >
+                Read Paper
+              </Link>
+            </div>
           </motion.div>
         </div>
       </header>
