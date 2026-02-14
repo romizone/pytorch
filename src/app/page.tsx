@@ -1,65 +1,163 @@
-import Image from "next/image";
+"use client";
+import React, { useState, useCallback } from "react";
+import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
+
+const NeuralNetworkVisualizer = dynamic(() => import("@/components/NeuralNetworkVisualizer"), { ssr: false });
+const TrainingChart = dynamic(() => import("@/components/TrainingChart"), { ssr: false });
+const PyTorchConcepts = dynamic(() => import("@/components/PyTorchConcepts"), { ssr: false });
+const XORPlayground = dynamic(() => import("@/components/XORPlayground"), { ssr: false });
+const TrainingPipeline = dynamic(() => import("@/components/TrainingPipeline"), { ssr: false });
+
+interface TrainingData {
+  epoch: number;
+  loss: number;
+  accuracy: number;
+}
 
 export default function Home() {
+  const [trainingData, setTrainingData] = useState<TrainingData[]>([]);
+  const [activeSection, setActiveSection] = useState("simulation");
+
+  const handleTrainingData = useCallback((data: TrainingData) => {
+    setTrainingData((prev) => [...prev.slice(-500), data]);
+  }, []);
+
+  const sections = [
+    { id: "simulation", label: "Live Simulation", icon: "⚡" },
+    { id: "concepts", label: "PyTorch Concepts", icon: "📚" },
+    { id: "xor", label: "XOR Playground", icon: "🎯" },
+    { id: "pipeline", label: "Training Pipeline", icon: "🔧" },
+  ];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-indigo-950">
+      {/* Hero Header */}
+      <header className="relative overflow-hidden border-b border-gray-800">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-600/10 via-transparent to-blue-600/10" />
+        <div className="max-w-7xl mx-auto px-4 py-8 relative">
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-white">
+                  PyTorch Neural Network
+                  <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent"> Simulation</span>
+                </h1>
+                <p className="text-sm text-gray-400">Interactive Machine Learning Education Platform</p>
+              </div>
+            </div>
+            <p className="text-gray-400 text-sm max-w-2xl mt-3">
+              Explore how neural networks work through interactive simulations. Build, train, and visualize networks
+              in real-time while learning PyTorch fundamentals with auto-generated code.
+            </p>
+          </motion.div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </header>
+
+      {/* Navigation */}
+      <nav className="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-xl border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex gap-1 py-2 overflow-x-auto">
+            {sections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => {
+                  setActiveSection(section.id);
+                  document.getElementById(section.id)?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                  activeSection === section.id
+                    ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20"
+                    : "text-gray-400 hover:text-white hover:bg-gray-800"
+                }`}
+              >
+                <span>{section.icon}</span>
+                {section.label}
+              </button>
+            ))}
+          </div>
         </div>
-      </main>
-    </div>
+      </nav>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
+        {/* Section 1: Live Simulation */}
+        <section id="simulation">
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
+            <div className="flex items-center gap-2 mb-6">
+              <span className="text-xl">⚡</span>
+              <h2 className="text-xl font-bold text-white">Live Neural Network Simulation</h2>
+            </div>
+            <div className="mb-2 p-3 bg-blue-600/10 border border-blue-500/20 rounded-lg">
+              <p className="text-xs text-blue-300">
+                <strong>How to use:</strong> Adjust the architecture (add/remove layers &amp; neurons), set hyperparameters,
+                then click &quot;Train&quot; to watch the network learn the XOR function. Click any neuron to inspect its values.
+                The PyTorch code below auto-updates to match your network configuration.
+              </p>
+            </div>
+            <NeuralNetworkVisualizer onTrainingData={handleTrainingData} />
+
+            {trainingData.length > 0 && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="mt-6">
+                <TrainingChart data={trainingData} />
+              </motion.div>
+            )}
+          </motion.div>
+        </section>
+
+        {/* Section 2: PyTorch Concepts */}
+        <section id="concepts">
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
+            <div className="flex items-center gap-2 mb-6">
+              <span className="text-xl">📚</span>
+              <h2 className="text-xl font-bold text-white">Core PyTorch Concepts</h2>
+            </div>
+            <PyTorchConcepts />
+          </motion.div>
+        </section>
+
+        {/* Section 3: XOR Playground */}
+        <section id="xor">
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
+            <div className="flex items-center gap-2 mb-6">
+              <span className="text-xl">🎯</span>
+              <h2 className="text-xl font-bold text-white">XOR Decision Boundary Playground</h2>
+            </div>
+            <XORPlayground />
+          </motion.div>
+        </section>
+
+        {/* Section 4: Training Pipeline */}
+        <section id="pipeline">
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
+            <div className="flex items-center gap-2 mb-6">
+              <span className="text-xl">🔧</span>
+              <h2 className="text-xl font-bold text-white">PyTorch Training Pipeline</h2>
+            </div>
+            <TrainingPipeline />
+          </motion.div>
+        </section>
+
+        {/* Footer */}
+        <footer className="border-t border-gray-800 pt-8 pb-4">
+          <div className="text-center">
+            <p className="text-gray-500 text-sm">
+              PyTorch Neural Network Simulation &mdash; Interactive ML Education Platform
+            </p>
+            <p className="text-gray-600 text-xs mt-2">
+              Built with Next.js, TypeScript, Tailwind CSS, and Framer Motion
+            </p>
+            <p className="text-gray-600 text-xs mt-1">
+              Romin Urismanto &copy; {new Date().getFullYear()}
+            </p>
+          </div>
+        </footer>
+      </div>
+    </main>
   );
 }
